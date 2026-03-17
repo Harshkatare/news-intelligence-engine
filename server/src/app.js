@@ -13,6 +13,10 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
+const newsRoutes = require("./routes/news.routes");
+app.use("/api/news", newsRoutes);
+
+
 // Health check
 app.get("/health", (req, res) => {
   res.json({ status: "ok", message: "Server running" });
