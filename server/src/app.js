@@ -16,6 +16,8 @@ app.use(express.json());
 const newsRoutes = require("./routes/news.routes");
 app.use("/api/news", newsRoutes);
 
+const enrichRoutes = require("./routes/enrich.routes");
+app.use("/api/enrich", enrichRoutes);
 
 // Health check
 app.get("/health", (req, res) => {
