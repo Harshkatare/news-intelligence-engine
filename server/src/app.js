@@ -19,6 +19,10 @@ app.use("/api/news", newsRoutes);
 const enrichRoutes = require("./routes/enrich.routes");
 app.use("/api/enrich", enrichRoutes);
 
+const readNewsRoutes = require("./routes/readNews.routes");
+app.use("/api/read", readNewsRoutes);
+
+
 // Health check
 app.get("/health", (req, res) => {
   res.json({ status: "ok", message: "Server running" });
