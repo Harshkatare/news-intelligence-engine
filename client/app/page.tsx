@@ -6,21 +6,24 @@ import { NewsItem } from "@/lib/types";
 import NewsCard from "@/components/NewsCard";
 
 const DEFAULT_SYMBOL = "AAPL";
+const PAGE_SIZE = 10;
 
 export default function HomePage() {
   const [symbol, setSymbol] = useState(DEFAULT_SYMBOL);
   const [input, setInput] = useState("");
   const [items, setItems] = useState<NewsItem[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function fetchNews(sym: string) {
+  async function fetchNews(sym: string, pageNum: number, append = false) {
     try {
       setLoading(true);
       setError(null);
 
       const res = await fetch(
-        `${API_BASE}/api/read/news?symbol=${sym}&limit=10`
+        `${API_BASE}/api/read/news?symbol=${sym}&page=${pageNum}&limit=${PAGE_SIZE}`
       );
 
       if (!res.ok) {
@@ -28,22 +31,33 @@ export default function HomePage() {
       }
 
       const data = await res.json();
-      setItems(data.items || []);
+      const newItems: NewsItem[] = data.items || [];
+
+      setItems((prev) => (append ? [...prev, ...newItems] : newItems));
+      setHasMore(newItems.length === PAGE_SIZE);
     } catch (err: any) {
       setError(err.message || "Something went wrong");
-      setItems([]);
+      if (!append) setItems([]);
     } finally {
       setLoading(false);
     }
   }
 
+  // Load first page when symbol changes
   useEffect(() => {
-    fetchNews(symbol);
+    setPage(1);
+    fetchNews(symbol, 1, false);
   }, [symbol]);
 
   function onSearch() {
     if (!input.trim()) return;
     setSymbol(input.trim().toUpperCase());
+  }
+
+  function loadMore() {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchNews(symbol, nextPage, true);
   }
 
   return (
@@ -63,14 +77,21 @@ export default function HomePage() {
 
       <h2>{symbol} News</h2>
 
-      {loading && <p>Loading...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {!loading &&
-        !error &&
-        items.map((item) => <NewsCard key={item._id} item={item} />)}
+      {items.map((item) => (
+        <NewsCard key={item._id} item={item} />
+      ))}
 
-      {!loading && !error && items.length === 0 && <p>No news found.</p>}
+      {loading && <p>Loading...</p>}
+
+      {!loading && hasMore && items.length > 0 && (
+        <button onClick={loadMore} style={{ marginTop: 20 }}>
+          Load more
+        </button>
+      )}
+
+      {!loading && items.length === 0 && <p>No news found.</p>}
     </main>
   );
 }
