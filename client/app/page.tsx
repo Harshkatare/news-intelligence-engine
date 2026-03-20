@@ -23,7 +23,7 @@ export default function HomePage() {
       setError(null);
 
       const res = await fetch(
-        `${API_BASE}/api/read/news?symbol=${sym}&page=${pageNum}&limit=${PAGE_SIZE}`
+        `${API_BASE}/api/read/news?symbol=${sym}&page=${pageNum}&limit=${PAGE_SIZE}`,
       );
 
       if (!res.ok) {
@@ -61,16 +61,39 @@ export default function HomePage() {
   }
 
   return (
-    <main style={{ maxWidth: 800, margin: "40px auto" }}>
+    <main style={{ maxWidth: 900, margin: "0px auto" }}>
       <h1>Stock News</h1>
 
-      <div style={{ marginBottom: 20 }}>
+      <div
+        style={{
+          display: "flex",
+          gap: 8,
+          marginBottom: 24,
+        }}
+      >
         <input
           placeholder="Search symbol (AAPL, AMZN...)"
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          style={{
+            flex: 1,
+            padding: "10px 12px",
+            fontSize: 16,
+            border: "1px solid #ccc",
+            borderRadius: 6,
+          }}
         />
-        <button onClick={onSearch} style={{ marginLeft: 8 }}>
+        <button
+          onClick={onSearch}
+          style={{
+            padding: "10px 16px",
+            fontSize: 16,
+            borderRadius: 6,
+            border: "none",
+            background: "#0a58ca",
+            color: "#fff",
+          }}
+        >
           Search
         </button>
       </div>
@@ -86,7 +109,17 @@ export default function HomePage() {
       {loading && <p>Loading...</p>}
 
       {!loading && hasMore && items.length > 0 && (
-        <button onClick={loadMore} style={{ marginTop: 20 }}>
+        <button
+          onClick={loadMore}
+          style={{
+            marginTop: 24,
+            padding: "10px 16px",
+            fontSize: 15,
+            borderRadius: 6,
+            border: "1px solid #ccc",
+            background: "#fff",
+          }}
+        >
           Load more
         </button>
       )}

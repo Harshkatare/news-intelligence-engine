@@ -45,15 +45,20 @@ export default function NewsDetailPage() {
   if (!article) return null;
 
   return (
-    <main style={{ maxWidth: 800, margin: "40px auto" }}>
+    <main style={{ maxWidth: 900, margin: "0 auto", padding: 24 }}>
       <h1>{article.optimizedTitle}</h1>
 
       <p style={{ color: "#666", marginBottom: 20 }}>
-        {article.source} ·{" "}
-        {new Date(article.publishedAt).toLocaleDateString()}
+        {article.source} · {new Date(article.publishedAt).toLocaleDateString()}
       </p>
 
-      <article style={{ lineHeight: 1.6, whiteSpace: "pre-line" }}>
+      <article
+        style={{
+          lineHeight: 1.8,
+          fontSize: 16,
+          whiteSpace: "pre-line",
+        }}
+      >
         {article.optimizedContent}
       </article>
     </main>
