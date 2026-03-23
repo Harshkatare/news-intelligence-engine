@@ -6,6 +6,18 @@ const { MAX_ARTICLES_TO_PROCESS } = require("../config/app.config");
 
 const AI_ENABLED = process.env.AI_ENABLED === "true";
 
+function parseAIOutput(text) {
+  const titleMatch = text.match(/TITLE:\s*([\s\S]*?)\nSUMMARY:/);
+  const summaryMatch = text.match(/SUMMARY:\s*([\s\S]*?)\nCONTENT:/);
+  const contentMatch = text.match(/CONTENT:\s*([\s\S]*)$/);
+
+  return {
+    title: titleMatch ? titleMatch[1].trim() : null,
+    summary: summaryMatch ? summaryMatch[1].trim() : null,
+    content: contentMatch ? contentMatch[1].trim() : text.trim(),
+  };
+}
+
 async function runEnrichmentForSymbol(symbol) {
   const rawArticles = await RawNews.find({ stockSymbol: symbol })
     .sort({ publishedAt: -1 })
@@ -40,15 +52,15 @@ async function runEnrichmentForSymbol(symbol) {
 
       if (!enrichedText) continue;
 
-      const [summary] = enrichedText.split("\n\n");
+      const parsed = parseAIOutput(enrichedText);
 
       await News.create({
         stockSymbol: raw.stockSymbol,
         originalTitle: raw.title,
-        optimizedTitle: raw.title,
+        optimizedTitle: parsed.title || raw.title,
         originalUrl: raw.url,
-        shortDescription: summary.slice(0, 300),
-        optimizedContent: enrichedText,
+        shortDescription: parsed.summary?.slice(0, 300),
+        optimizedContent: parsed.content,
         source: raw.source,
         publishedAt: raw.publishedAt,
         aiModel: usedModel,
